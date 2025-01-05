@@ -3,9 +3,8 @@ import User from "./User.model";
 import QueryBuilder, { QueryParams } from "../../utils/QueryBuilder";
 import { userSearchableFields } from "./User.constant";
 
-const createUserIntoDB = async (user: Partial<TUser>) =>
-  await User.create(user);
-const getAllUserFromDB = async (query: QueryParams) => {
+const createUser = async (user: Partial<TUser>) => await User.create(user);
+const getAllUser = async (query: QueryParams) => {
   const userQuery = new QueryBuilder(User.find(), query)
     .search(userSearchableFields)
     .filter()
@@ -21,13 +20,13 @@ const getAllUserFromDB = async (query: QueryParams) => {
     users,
   };
 };
-const getAUserFromDB = async (email: string) =>
+const getAUser = async (email: string) =>
   await User.findOne({
     email,
   });
 
 export const UserServices = {
-  createUserIntoDB,
-  getAllUserFromDB,
-  getAUserFromDB,
+  createUser,
+  getAllUser,
+  getAUser,
 };

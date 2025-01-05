@@ -50,7 +50,7 @@ export const auth = (
     }
 
     // Check if the user's role is included in the list of allowed roles
-    if (roles.length && !roles.includes(user.role)) {
+    if (!roles.includes(user.role)) {
       // If the user's role is not allowed, throw a "Permission denied" error
       throw new AppError(StatusCodes.FORBIDDEN, "Permission denied!");
     }

@@ -1,9 +1,9 @@
-import { model, Schema, Types, Document } from "mongoose";
+import { model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
-import { TUser, TUserModel } from "./User.interface";
+import { TUser, TBloodGroup, bloodGroups } from "./User.interface";
 import config from "../../config";
 
-const userSchema = new Schema<TUser, TUserModel, {}>(
+const userSchema = new Schema<TUser, any, {}>(
   {
     name: {
       type: {
@@ -28,6 +28,11 @@ const userSchema = new Schema<TUser, TUserModel, {}>(
     },
     dateOfBirth: {
       type: Date,
+      required: true,
+    },
+    bloodGroup: {
+      type: String,
+      enum: bloodGroups,
       required: true,
     },
     password: {
@@ -65,6 +70,6 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-const User = model<TUser, TUserModel>("User", userSchema);
+const User = model<TUser, any>("User", userSchema);
 
 export default User;

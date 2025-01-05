@@ -6,16 +6,8 @@ import { StatusCodes } from "http-status-codes";
 import { TUser } from "./User.interface";
 
 const createUser: RequestHandler = catchAsync(async (req, res) => {
-  const {
-    firstName,
-    lastName,
-    gender,
-    email,
-    contactNo,
-    dateOfBirth,
-    password,
-    image,
-  } = req.body;
+  const { firstName, lastName, gender, email, dateOfBirth, password, avatar } =
+    req.body;
 
   const userData: Partial<TUser> = {
     name: { firstName, lastName },
@@ -23,25 +15,22 @@ const createUser: RequestHandler = catchAsync(async (req, res) => {
     email,
     password,
     dateOfBirth: new Date(dateOfBirth),
-    contactNo,
-    image: image,
+    avatar,
   };
 
-  const result = await UserServices.createUserIntoDB(userData);
+  const result = await UserServices.createUser(userData);
 
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
-    success: true,
     message: "User created successfully!",
     data: result,
   });
 });
 
 const getAllUser: RequestHandler = catchAsync(async (req, res) => {
-  const users = await UserServices.getAllUserFromDB(req.query);
+  const users = await UserServices.getAllUser(req.query);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
-    success: true,
     message: "Users are retrieved successfully!",
     data: users,
   });
@@ -50,10 +39,9 @@ const getAllUser: RequestHandler = catchAsync(async (req, res) => {
 const getAUser: RequestHandler = catchAsync(async (req, res) => {
   const { email } = req.params;
 
-  const users = await UserServices.getAUserFromDB(email);
+  const users = await UserServices.getAUser(email);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
-    success: true,
     message: "User is retrieved successfully!",
     data: users,
   });
