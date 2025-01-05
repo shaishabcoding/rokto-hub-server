@@ -1,5 +1,6 @@
 import { Model, Types } from "mongoose";
-import { TBadge } from "./User.constant";
+
+export type TUserRole = "USER" | "ADMIN";
 
 export type TUser = {
   _id: Types.ObjectId;
@@ -7,19 +8,15 @@ export type TUser = {
     firstName: string;
     lastName: string;
   };
+  avatar: string;
   gender: "male" | "female";
   email: string;
   password: string;
   dateOfBirth: Date;
-  contactNo: string;
-  role: "USER" | "ADMIN" | "SUPER_ADMIN";
+  role: TUserRole;
   status: "ACTIVE" | "SUSPENDED" | "DELETED";
-  badge: TBadge;
-  image: string;
+  badge: string[];
+  address: string;
 };
 
-export type TUserMethods = {
-  isUserExist(id: Types.ObjectId): Promise<TUser | null>;
-};
-
-export type TUserModel = Model<TUser, Record<string, never>, TUserMethods>;
+export type TUserModel = Model<TUser, Record<string, never>, {}>;

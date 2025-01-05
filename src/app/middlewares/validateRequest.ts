@@ -2,6 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { AnyZodObject } from "zod";
 import catchAsync from "../utils/catchAsync";
 
+/**
+ * Middleware to validate incoming requests against a Zod schema.
+ */
 const validateRequest = (schema: AnyZodObject) => {
   return catchAsync(
     async (req: Request, _res: Response, next: NextFunction) => {

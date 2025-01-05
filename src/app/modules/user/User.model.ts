@@ -1,21 +1,14 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema, Types, Document } from "mongoose";
 import bcrypt from "bcrypt";
-import { TUser, TUserMethods, TUserModel } from "./User.interface";
+import { TUser, TUserModel } from "./User.interface";
 import config from "../../config";
-import { badgeEnums } from "./User.constant";
 
-const userSchema = new Schema<TUser, TUserModel, TUserMethods>(
+const userSchema = new Schema<TUser, TUserModel, {}>(
   {
     name: {
       type: {
-        firstName: {
-          type: String,
-          required: true,
-        },
-        lastName: {
-          type: String,
-          required: true,
-        },
+        firstName: { type: String, required: true },
+        lastName: { type: String, required: true },
       },
       required: true,
     },
@@ -29,11 +22,7 @@ const userSchema = new Schema<TUser, TUserModel, TUserMethods>(
       required: true,
       unique: true,
     },
-    image: {
-      type: String,
-      required: true,
-    },
-    contactNo: {
+    avatar: {
       type: String,
       required: true,
     },
@@ -48,7 +37,7 @@ const userSchema = new Schema<TUser, TUserModel, TUserMethods>(
     },
     role: {
       type: String,
-      enum: ["ADMIN", "USER", "SUPER_ADMIN"],
+      enum: ["ADMIN", "USER"],
       default: "USER",
     },
     status: {
@@ -57,33 +46,25 @@ const userSchema = new Schema<TUser, TUserModel, TUserMethods>(
       default: "ACTIVE",
     },
     badge: {
+      type: [String],
+      default: [],
+    },
+    address: {
       type: String,
-      enum: badgeEnums,
-      default: "bronze",
+      required: true,
     },
   },
   { timestamps: true }
 );
 
-userSchema.virtual("name.fullName").get(function () {
-  return `${this.name?.firstName} ${this.name?.lastName}`;
-});
-
+// Pre-save middleware to hash the password
 userSchema.pre("save", async function (next) {
-  const user = this;
-  user.password = await bcrypt.hash(user.password, config.bcrypt_salt_rounds);
-
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, config.bcrypt_salt_rounds);
+  }
   next();
 });
 
-userSchema.post("save", async function (doc, next) {
-  doc.password = "";
-  next();
-});
-
-userSchema.methods.isUserExist = async (id: Types.ObjectId) =>
-  await User.findById(id);
-
-const User = model<TUser>("User", userSchema);
+const User = model<TUser, TUserModel>("User", userSchema);
 
 export default User;

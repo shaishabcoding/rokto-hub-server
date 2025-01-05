@@ -1,4 +1,4 @@
-import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
+import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 import config from "../config";
 import AppError from "../errors/AppError";
@@ -7,67 +7,71 @@ import handleDuplicateError from "../errors/handleDuplicateError";
 import handleValidationError from "../errors/handleValidationError";
 import handleZodError from "../errors/handleZodError";
 import { TErrorSources } from "../interface/error";
+import { StatusCodes } from "http-status-codes";
 
+/**
+ * Global Error Handler Middleware
+ *
+ * Handles all errors in the application, formats them into a standardized response,
+ * and optionally logs the error stack in development mode.
+ */
 const globalErrorHandler: ErrorRequestHandler = (
   err,
   _req,
   res,
   _next
-): any => {
-  let statusCode = 500;
-  let message = "Something went wrong!";
-  let errorSources: TErrorSources = [
-    {
-      path: "",
-      message: "Something went wrong",
-    },
-  ];
+): void => {
+  // Default Error Response Structure
+  let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+  let message = "An unexpected error occurred!";
+  let errorSources: TErrorSources = [{ path: "", message }];
 
-  if (err instanceof ZodError) {
-    const simplifiedError = handleZodError(err);
-    statusCode = simplifiedError?.statusCode;
-    message = simplifiedError?.message;
-    errorSources = simplifiedError?.errorSources;
-  } else if (err?.name === "ValidationError") {
-    const simplifiedError = handleValidationError(err);
-    statusCode = simplifiedError?.statusCode;
-    message = simplifiedError?.message;
-    errorSources = simplifiedError?.errorSources;
-  } else if (err?.name === "CastError") {
-    const simplifiedError = handleCastError(err);
-    statusCode = simplifiedError?.statusCode;
-    message = simplifiedError?.message;
-    errorSources = simplifiedError?.errorSources;
-  } else if (err?.code === 11000) {
-    const simplifiedError = handleDuplicateError(err);
-    statusCode = simplifiedError?.statusCode;
-    message = simplifiedError?.message;
-    errorSources = simplifiedError?.errorSources;
-  } else if (err instanceof AppError) {
-    statusCode = err?.statusCode;
-    message = err.message;
-    errorSources = [
-      {
-        path: "",
-        message: err?.message,
-      },
-    ];
-  } else if (err instanceof Error) {
-    message = err.message;
-    errorSources = [
-      {
-        path: "",
-        message: err?.message,
-      },
-    ];
+  // Structured Error Handling Logic
+  switch (true) {
+    case err instanceof ZodError:
+      ({ statusCode, message, errorSources } = handleZodError(err));
+      break;
+
+    case err.name === "ValidationError":
+      ({ statusCode, message, errorSources } = handleValidationError(err));
+      break;
+
+    case err.name === "CastError":
+      ({ statusCode, message, errorSources } = handleCastError(err));
+      break;
+
+    case err.code === 11000: // MongoDB Duplicate Key Error
+      ({ statusCode, message, errorSources } = handleDuplicateError(err));
+      break;
+
+    case err instanceof AppError:
+      statusCode = err.statusCode || StatusCodes.BAD_REQUEST;
+      message = err.message || "Application Error!";
+      errorSources = [{ path: "", message }];
+      break;
+
+    case err instanceof Error: // Native JavaScript Errors
+      message = err.message || "Unknown Error!";
+      errorSources = [{ path: "", message }];
+      break;
+
+    default:
+      // Catch-all for any unhandled error types
+      message = "An unhandled error occurred!";
+      errorSources = [{ path: "", message }];
   }
 
-  return res.status(statusCode).json({
+  // Log the error stack in development mode (optional)
+  if (config.node_env === "development") {
+    console.error("Error Stack:", err.stack);
+  }
+
+  // Final Error Response
+  res.status(statusCode).json({
     success: false,
     message,
     errorSources,
-    err,
-    stack: config.node_env === "development" ? err?.stack : null,
+    stack: config.node_env === "development" ? err.stack : undefined,
   });
 };
 

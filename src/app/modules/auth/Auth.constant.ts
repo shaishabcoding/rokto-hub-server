@@ -8,13 +8,11 @@ export const adminData: Partial<TUser> = {
   },
   gender: "male",
   email: config.admin_email,
-  contactNo: "+8801823466316",
   dateOfBirth: new Date("2006-04-04T00:00:00.000Z"),
   password: config.admin_pass,
   role: "ADMIN",
-  status: "ACTIVE",
-  badge: "platinum",
-  image: "https://avatars.githubusercontent.com/u/109936547?v=4",
+  avatar: "https://avatars.githubusercontent.com/u/109936547?v=4",
+  address: "Bangladesh",
 };
 
 export const makeResetBody = (resetToken: string) => `
