@@ -4,5 +4,7 @@ import { TUser } from "../modules/user/User.interface";
 declare global {
   namespace Express {
     interface Request {
-      user: TUserii
-      
+      user: TUser;
+    }
+  }
+}
