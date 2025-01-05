@@ -1,5 +1,9 @@
 import { FilterQuery, Query } from "mongoose";
 
+/**
+ * Interface for query parameters.
+ * Used to handle query parameters for filtering, searching, sorting, pagination, and selecting fields.
+ */
 export type QueryParams = {
   searchTerm?: string;
   sort?: string;
@@ -9,9 +13,25 @@ export type QueryParams = {
   [key: string]: unknown;
 };
 
+/**
+ * Class to build and execute MongoDB queries based on query parameters.
+ * Handles search, filtering, sorting, pagination, and field selection for a given model query.
+ */
 class QueryBuilder<T> {
+  /**
+   * Creates an instance of QueryBuilder.
+   *
+   * @param modelQuery - The query object for the mongoose model to be manipulated.
+   * @param query - The query parameters to build the query.
+   */
   constructor(public modelQuery: Query<T[], T>, public query: QueryParams) {}
 
+  /**
+   * Adds a search condition to the query based on the provided searchable fields.
+   *
+   * @param searchableFields - The fields to be searched.
+   * @returns The current instance of QueryBuilder with the search condition applied.
+   */
   search(searchableFields: string[]) {
     const { searchTerm } = this.query;
 
@@ -27,6 +47,11 @@ class QueryBuilder<T> {
     return this;
   }
 
+  /**
+   * Adds filtering conditions to the query based on the query parameters (excluding pagination, sort, etc.).
+   *
+   * @returns The current instance of QueryBuilder with the filter conditions applied.
+   */
   filter() {
     const excludeFields = new Set([
       "searchTerm",
@@ -46,12 +71,22 @@ class QueryBuilder<T> {
     return this;
   }
 
+  /**
+   * Adds a sorting condition to the query based on the provided sort parameter.
+   *
+   * @returns The current instance of QueryBuilder with the sort condition applied.
+   */
   sort() {
     const sortBy = this.query.sort?.replace(/,/g, " ") || "-createdAt";
     this.modelQuery = this.modelQuery.sort(sortBy);
     return this;
   }
 
+  /**
+   * Adds pagination to the query based on the provided page and limit parameters.
+   *
+   * @returns The current instance of QueryBuilder with the pagination applied.
+   */
   paginate() {
     const page = Number(this.query.page) || 1;
     const limit = Number(this.query.limit) || 10;
@@ -61,12 +96,22 @@ class QueryBuilder<T> {
     return this;
   }
 
+  /**
+   * Adds field selection to the query based on the provided fields parameter.
+   *
+   * @returns The current instance of QueryBuilder with the field selection applied.
+   */
   fields() {
     const fieldsToSelect = this.query.fields?.replace(/,/g, " ") || "-__v";
     this.modelQuery = this.modelQuery.select(fieldsToSelect);
     return this;
   }
 
+  /**
+   * Counts the total number of documents in the query result, along with pagination information.
+   *
+   * @returns An object containing pagination information such as current page, limit, total documents, and total pages.
+   */
   async countTotal() {
     const totalQueries = this.modelQuery.getFilter();
     const total = await this.modelQuery.model.countDocuments(totalQueries);
