@@ -31,20 +31,26 @@ const loginUser = async ({ email, password }: TLoginUser) => {
   }
 
   const {
-    contactNo,
     dateOfBirth,
     gender,
     name: { firstName, lastName },
     role,
+    bloodGroup,
+    avatar,
+    address,
+    badge,
   } = user.toJSON();
 
   const partialUser: Partial<TUser> = {
     email,
-    contactNo,
     dateOfBirth,
     gender,
     name: { firstName, lastName },
     role,
+    bloodGroup,
+    avatar,
+    address,
+    badge,
   };
 
   const jwtPayload = {

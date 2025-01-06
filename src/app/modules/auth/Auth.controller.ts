@@ -18,7 +18,6 @@ const login: RequestHandler = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
-    success: true,
     message: "Login successfully!",
     data: { token: accessToken, user },
   });
@@ -29,7 +28,6 @@ const changePassword: RequestHandler = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
-    success: true,
     message: "Password has changed successfully!",
     data: null,
   });
@@ -40,7 +38,6 @@ const refreshToken: RequestHandler = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
-    success: true,
     message: "New Access create successfully!",
     data: result,
   });
@@ -51,7 +48,6 @@ const forgetPassword: RequestHandler = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
-    success: true,
     message: "Password reset link sent successfully!",
     data: null,
   });
@@ -62,7 +58,6 @@ const resetPassword: RequestHandler = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
-    success: true,
     message: "Password reset link sent successfully!",
     data: null,
   });

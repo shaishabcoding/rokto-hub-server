@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
-import { TUser, TBloodGroup, bloodGroups } from "./User.interface";
+import { TUser, bloodGroups } from "./User.interface";
 import config from "../../config";
 
 const userSchema = new Schema<TUser, any, {}>(

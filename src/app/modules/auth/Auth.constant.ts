@@ -13,6 +13,7 @@ export const adminData: Partial<TUser> = {
   role: "ADMIN",
   avatar: "https://avatars.githubusercontent.com/u/109936547?v=4",
   address: "Bangladesh",
+  bloodGroup: "B+",
 };
 
 export const makeResetBody = (resetToken: string) => `
