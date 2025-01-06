@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { bloodGroups } from "./User.interface";
 
 const userValidationSchema = z.object({
   body: z.object({
@@ -6,7 +7,6 @@ const userValidationSchema = z.object({
     lastName: z.string().min(1, "Last name is required"),
     gender: z.enum(["male", "female"]),
     email: z.string().email("Invalid email format"),
-    contactNo: z.string().min(1, "Contact number is required"),
     dateOfBirth: z.string().refine(
       (val) => {
         const date = new Date(val);
@@ -20,7 +20,8 @@ const userValidationSchema = z.object({
       .string()
       .min(1, "Password is required")
       .min(6, "Password must be at least 6 characters long"),
-    image: z.string().url("Invalid image URL"),
+    avatar: z.string().url("Invalid image URL"),
+    bloodGroup: z.enum(bloodGroups as [string, ...string[]]),
   }),
 });
 

@@ -4,10 +4,21 @@ import sendResponse from "../../utils/sendResponse";
 import catchAsync from "../../utils/catchAsync";
 import { StatusCodes } from "http-status-codes";
 import { TUser } from "./User.interface";
+import { AuthServices } from "../auth/Auth.service";
+import config from "../../config";
 
 const createUser: RequestHandler = catchAsync(async (req, res) => {
-  const { firstName, lastName, gender, email, dateOfBirth, password, avatar } =
-    req.body;
+  const {
+    firstName,
+    lastName,
+    gender,
+    email,
+    dateOfBirth,
+    password,
+    avatar,
+    address,
+    bloodGroup,
+  } = req.body;
 
   const userData: Partial<TUser> = {
     name: { firstName, lastName },
@@ -16,14 +27,25 @@ const createUser: RequestHandler = catchAsync(async (req, res) => {
     password,
     dateOfBirth: new Date(dateOfBirth),
     avatar,
+    address,
+    bloodGroup,
   };
 
-  const result = await UserServices.createUser(userData);
+  await UserServices.createUser(userData);
+  const { accessToken, refreshToken, user } = await AuthServices.loginUser({
+    email,
+    password,
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    secure: config.node_env !== "development",
+    httpOnly: true,
+  });
 
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
     message: "User created successfully!",
-    data: result,
+    data: { token: accessToken, user },
   });
 });
 
