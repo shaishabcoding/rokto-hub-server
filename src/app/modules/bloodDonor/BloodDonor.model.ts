@@ -3,7 +3,12 @@ import { TBloodDonor } from "./BloodDonor.interface";
 import { bloodGroups } from "../user/User.interface";
 
 const bloodDonorSchema = new Schema<TBloodDonor, any, {}>({
-  user: { type: Schema.Types.ObjectId, required: true, ref: "User" },
+  user: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
+    unique: true,
+  },
   bloodGroup: {
     type: String,
     enum: bloodGroups,
@@ -17,11 +22,11 @@ const bloodDonorSchema = new Schema<TBloodDonor, any, {}>({
   isAvailable: { type: Boolean, default: true },
   donatedQuantity: {
     type: Number,
-    required: true,
+    default: 0,
   },
-  lastDonationDate: { type: Date, required: true },
+  lastDonationDate: Date,
   contactNo: { type: String, required: true },
-  isPublished: { type: Boolean, default: true },
+  isPublished: { type: Boolean, default: false },
 });
 
 const BloodDonor = model<TBloodDonor, any>("BloodDonor", bloodDonorSchema);
